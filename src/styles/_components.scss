@@ -1,0 +1,166 @@
+@import "styleguide";
+@mixin FlexCenter($direction) {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-flow: $direction;
+}
+@mixin random-color($selector) {
+  #{$selector}: unquote("rgba(#{random(256) - 1}, #{random(256)-1}, #{random(256 - 1)}, #{random(100)/100})");
+}
+
+@mixin FullWidth {
+  width: 100%;
+}
+
+.button {
+  background: #857F72;
+
+  bottom: 2rem;
+  @include FlexCenter(row);
+
+  &.project{
+
+    //width: 210px;
+    height: 40px;
+  }
+  &.task {
+    width: 80px;
+    height: 80px;
+    position: absolute;
+    right: 2rem;
+    -webkit-border-radius: 90px;
+    -moz-border-radius: 90px;
+    border-radius: 90px;
+    &:hover {
+      background: none;
+      border: 1px solid $color7;
+      cursor: pointer;
+      box-shadow: rgba(184, 178, 167, 0.15) 0px 0px 3px 3px;
+    }
+  }
+}
+
+
+.project-component {
+  align-items: center;
+  height: 40px;
+  background: $color3;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  display: flex;
+  cursor: pointer;
+  &:hover {
+    background: $color4;
+    transition: 1s;
+  }
+  &.selected {
+    background: $color7;
+  }
+
+}
+.project-name {
+  display: flex;
+  font-size: 1.4rem;
+  flex-grow: 4;
+  justify-content: center;
+}
+.trash {
+  display: flex;
+  justify-content: center;
+  min-width: 40px;
+  max-width: 40px;
+  > img {
+    max-height: 20px;
+    max-width: 20px;
+    &:hover {
+      filter: invert(1);
+    }
+  }
+}
+
+#tasks {
+  margin-left: 16px;
+  display: flex;
+  flex-flow: column;
+  width: 80%;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+.task-component {
+  margin: 4px;
+  margin-top: 0px;
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+  height: 40px;
+  background: #423D33;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+
+  &.three {
+  border: 1px solid $task-color3;
+}
+
+  &.two {
+    border: 1px solid $task-color2;
+  }
+  &.one {
+    border: 2px solid $task-color1;
+  }
+}
+
+
+
+.task-checkbox {
+  min-width: 24px;
+  min-height: 24px;
+  background: $color8;
+  margin-right: 16px;
+  border: 1px solid black;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  &:hover{
+    background: $color2;
+    transition: .5s;
+  }
+}
+
+.task-description {
+  flex-grow: 3;
+}
+.task-date{
+  flex-grow: 1;
+  justify-self: end;
+  padding-right: 16px;
+}
+
+
+#fullscreen-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#add-project-button {
+  background: $color2;
+  color: $task-color3;
+}
+#warning-confirm, #warning-deny {
+  width: 80px;
+  &:hover {
+    background: none;
+    border: 1px solid #DDCA7D;
+    cursor: pointer;
+  }
+}
+
+button:hover {
+  background: none;
+  border: 1px solid #DDCA7D;
+  cursor: pointer;
+}

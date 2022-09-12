@@ -1,0 +1,78 @@
+@import "styleguide";
+html {
+  margin: 0px;
+  height: 100%;
+  width: 100%;
+  background: $color0;
+}
+body {
+
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+
+
+}
+#content {
+  min-height: 100vh;
+
+  display: grid;
+  grid-template: 1fr 4fr / minmax(150px, 1fr) 3.5fr;
+  place-content: stretch;
+  grid-template-areas:
+  'header header'
+  'sidebar tasks';
+}
+
+
+
+#header{
+  grid-area: header;
+}
+
+#tasks {
+  grid-area: tasks;
+}
+
+#sidebar {
+
+  grid-area: sidebar;
+  display: grid;
+  grid-template: 120px 32px 5fr 32px 2fr 40px / 1fr;
+  grid-template-areas:
+'project-one'
+          '.'
+'project-two'
+'.'
+'add-project'
+'.';
+
+}
+
+.project-container, #add-project-button {
+  //overflow-y: scroll;
+  background: $color2;
+  margin-left: 4px;
+  border-radius: 3px;
+  &.default-projects {
+    grid-area: project-one;
+  }
+  &.user-projects {
+    grid-area: project-two;
+  }
+}
+
+#add-project-button{
+  grid-area: add-project;
+  height: 80px;
+  &:hover{
+    background: none;
+    border: 1px solid $color7;
+    color: #D3CEC4;
+    cursor: pointer;
+  }
+}
+
+.projects{
+  grid-area: add-project;
+}

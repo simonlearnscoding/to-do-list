@@ -1,0 +1,110 @@
+.fullscreen-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  overflow: auto;
+  backdrop-filter: blur(5px);
+}
+@import "styleguide";
+
+.popup {
+  background: rgba($color1, .6);
+  fill-opacity: .2;
+  border-radius: 6px;
+  width: 50%;
+  height: 40vh;
+  display: grid;
+  padding: 2rem;
+  &.task {
+    grid-area: 2fr 2fr 1fr 2fr / 2fr 1fr 1fr 1fr;
+    grid-template-areas:
+  ' name name name name '
+  ' desc desc desc desc '
+  ' proj proj prio date '
+  ' . . cancel ok';
+  }
+
+  justify-content: center;
+  align-items: center;
+
+
+}
+
+.popup * {
+  margin: 4px;
+  border: none;
+  padding: 4px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+
+.name, .desc {
+  background: $color6;
+  color: black;
+
+}
+
+.name{
+  height: 40px;
+  grid-area: name;
+}
+.desc {
+  height: 24px;
+  opacity: .5;
+  grid-area: desc;
+
+}
+.proj {
+  grid-area: proj;
+  background: none;
+}
+
+.prio {
+  background: none;
+  grid-area: prio;
+
+}
+
+.date {
+  grid-area: date;
+  justify-self: end;
+  //display: flex;
+  //flex-flow: column;
+}
+input {
+  color: #000;
+}
+.cancel, .ok {
+  height: 40px;
+
+}
+#date {
+  justify-self: end;
+}
+
+.cancel, #cancel {
+  border: 1px solid $task-color1;
+  background: none;
+  color: $task-color1;
+}
+.cancel {
+  grid-area: cancel;
+}
+
+
+.ok, #add-project-confirm{
+  background: $task-color1;
+  color: $task-color3;
+
+}
+.ok {
+  grid-area: ok;
+}
+
+#add-project-confirm {
+  height: 40px;
+}
+
