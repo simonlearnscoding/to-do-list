@@ -13,6 +13,9 @@
   width: 100%;
 }
 
+* {
+  font-family: 'Montserrat', sans-serif;
+}
 .button {
   background: #857F72;
 
@@ -66,7 +69,7 @@
   flex-grow: 4;
   justify-content: center;
 }
-.trash {
+.trash, .edit {
   display: flex;
   justify-content: center;
   min-width: 40px;

@@ -1,3 +1,12 @@
+@font-face {
+  font-family: myFirstFont;
+  src: url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100&display=swap");
+  font-family: "Montserrat", sans-serif;
+}
+* {
+  font-family: "Montserrat", sans-serif;
+}
+
 .button {
   background: #857F72;
   bottom: 2rem;
@@ -50,17 +59,17 @@
   justify-content: center;
 }
 
-.trash {
+.trash, .edit {
   display: flex;
   justify-content: center;
   min-width: 40px;
   max-width: 40px;
 }
-.trash > img {
+.trash > img, .edit > img {
   max-height: 20px;
   max-width: 20px;
 }
-.trash > img:hover {
+.trash > img:hover, .edit > img:hover {
   filter: invert(1);
 }
 
@@ -147,6 +156,11 @@ button:hover {
   cursor: pointer;
 }
 
+@font-face {
+  font-family: myFirstFont;
+  src: url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100&display=swap");
+  font-family: "Montserrat", sans-serif;
+}
 html {
   margin: 0px;
   height: 100%;
@@ -220,6 +234,11 @@ body {
   backdrop-filter: blur(5px);
 }
 
+@font-face {
+  font-family: myFirstFont;
+  src: url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100&display=swap");
+  font-family: "Montserrat", sans-serif;
+}
 .popup {
   background: rgba(10, 10, 10, 0.6);
   fill-opacity: 0.2;
@@ -309,6 +328,12 @@ input {
 
 #add-project-confirm {
   height: 40px;
+}
+
+@font-face {
+  font-family: myFirstFont;
+  src: url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100&display=swap");
+  font-family: "Montserrat", sans-serif;
 }
 
 /*# sourceMappingURL=style.css.map */

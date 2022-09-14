@@ -93,25 +93,22 @@ class read{
 
 
     static getProjects() {
-        const obj = read.getItems('project')
-        // const nameArray = []
-        //     for(let number in obj){
-        //         nameArray.push(number['name'])
-        //     }
+        const obj = read.getItems('project').map(proj => proj['name'])
         return obj
     }
 
     static getTasks(){
-        return read.getItems('tasks') //TODO filter for project
+        return read.getItems('tasks')
         }
 
     static filterTasksforProject(tasks, project){
-        let obj = []
-        for (const item in tasks) {
-            if (tasks[item]['project'] === project) {
-                obj.push(tasks[item])
-            }
-        }
+        // let obj = []
+        let obj = tasks.filter(item => item['project'] ==  project)
+        // for (const item in tasks) {
+        //     if (tasks[item]['project'] === project) {
+        //         obj.push(tasks[item])
+        //     }
+        // }
         return obj;
 
     }
@@ -119,10 +116,7 @@ class read{
     static getItems(type) {
         let product = localStorage.getItem(type);
         product = JSON.parse(product)
-        let obj = []
-        for (const item in product) {
-            obj.push(product[item]);
-        }
+        let obj = product.map(item => item)
         return obj;
     }
 }

@@ -1,7 +1,7 @@
 import Icon from "../assets/iconPlus.png";
 import IconTrash from "../assets/icon-trash.svg"
 import IconEdit from "../assets/icon-edit.svg"
-
+const dayjs = require('dayjs')
 import UI, {body, content} from './interface';
 import {read, write} from "./read-write";
 
@@ -22,13 +22,13 @@ export default class Elements {
     static createElements() {
 
         projectComponents.loadProjects();
-        tasks.loadTasks('inbox'); // TODO filter for inbox
+        taskComponents.loadTasks('inbox'); // TODO filter for inbox
         buttons.createButtons();
         projectComponents.selectedInbox();
 
 
         document.addEventListener('keydown', (event) => {
-            buttons.keyButtons(event.key)
+            buttons.keyButtons(event)
         });
     }
 
@@ -41,12 +41,13 @@ export default class Elements {
 
 class buttons {
 
-    static keyButtons(key) {
+    static keyButtons(event) {
+        const key = event.key
         if(key == "Escape") {
             popups.closePopup();
         }
         // TODO: bugfix buttons shouldnt work if in popup
-
+        if(popUpOpen){ return }
         if(key == "q") {
             popups.createTaskPopup();
         }
@@ -55,7 +56,6 @@ class buttons {
             popups.createProjectPopup();
         }
     }
-
     static createButtons() {
         buttons.#createProjectButton();
         buttons.#createTaskButton();
@@ -97,8 +97,17 @@ class textContent{
         console.log(str)
         return str
     }
+    static taskprojclusterfuck(task)         {
+        try {
+            return  task.project
+        }
+        catch(err) { return null}
+    }
     static taskForm(editMode, task=null) {
-        let options = projectComponents.getProjectOptions(task.project) // TODO get all project names
+
+
+        let taskproject = textContent.taskprojclusterfuck(task)
+        let options = projectComponents.getProjectOptions(taskproject) // TODO get all project names
         let content = ''
         if(editMode) {
 
@@ -121,7 +130,7 @@ class textContent{
 </div>
             <div class="date">
            <label for="date">Due Date</label>
-           <input type="date" name="date" id="date">
+           <input type="date" name="date" value="${task.date}" id="date">
 </div>
              
          <textarea class="desc" name="description" value="${task.description}" form="task-input-form"  cols="1" rows="1"></textarea>
@@ -158,7 +167,6 @@ class textContent{
         <button class="ok">Add Task</button>`
 
         return content}
-
     static projectForm(editMode, project) {
         let content = ''
         if(editMode) {
@@ -224,11 +232,11 @@ class popups {
             if (type == 'project') {
                 projectComponents.loadUserProjects()
                 if(!edit) {
-                    tasks.loadTasks(currentProject);
+                    taskComponents.loadTasks(currentProject);
                 }
                 return
             }
-            tasks.loadTasks(currentProject);
+            taskComponents.loadTasks(currentProject);
 
 
 
@@ -278,7 +286,7 @@ class projectComponents {
             string = "<option value='inbox'>Inbox</option>"
         }
         for (let name of projectComponents) {
-            let option = name['name']
+            let option = name
 
             if (option == selectedProject) {
                 string += `\n<option selected="selected" value="${option}">${option}</option>`
@@ -298,7 +306,7 @@ class projectComponents {
         document.getElementById('user-projects').innerHTML = ''
         const projectComponents = read.getProjects();
         for (let name of projectComponents) {
-            this.#makeProject(name['name'], 'user-projects')
+            this.#makeProject(name, 'user-projects')
         }
 }
     static #loadDefaultProjects(){
@@ -361,6 +369,7 @@ button.addEventListener('click', (event) => popups.createProjectPopup(project = 
     }
 
     static #delProjPopup(project) {
+        popUpOpen = true
         // let projecc = project.target.parentNode.previousSibling.textContent;
         let content = `<h2> Are you sure you want to delete this project?<\h2>
 <button id="warning-confirm" class="ok" value="1"> Yes </button>
@@ -368,6 +377,7 @@ button.addEventListener('click', (event) => popups.createProjectPopup(project = 
             let form = UI.addHTML('form', content, ["popup", 'warning'] , null )
             popups.createGrayContainer(form)
             form.addEventListener('click', function(event) {
+
                 popups.closePopup();
                 if(event.target.value == 1)
                 {
@@ -382,14 +392,15 @@ button.addEventListener('click', (event) => popups.createProjectPopup(project = 
             projectComponents.selectedInbox();
         }
         projectComponents.loadProjects();
-        tasks.loadTasks(currentProject);
+        taskComponents.loadTasks(currentProject);
 
     }
 
     static #projectSelect(project) {
         css(project);
         currentProject = project;
-        tasks.loadTasks(project);
+
+        taskComponents.loadTasks(project);
 
         function css(project) {
             let allProjects = document.querySelectorAll('.project-component')
@@ -408,31 +419,176 @@ button.addEventListener('click', (event) => popups.createProjectPopup(project = 
     }
 }
 
-class tasks {
+class taskComponents {
 
     static loadTasks(project){
         Elements.emptyContainer('tasks')
-        let taskComponents = read.getTasks();
-        taskComponents = read.filterTasksforProject(taskComponents, project);
-        for (let name in taskComponents) {
-            this.#makeTask(taskComponents[name])
+        let tasks = read.getTasks();
+
+        let filteredTasks = filterTasks(project, tasks);
+        spawnTasks(filteredTasks);
+
+
+        function filterTasks(project, tasks) {
+            if(isTimedProject(project)) {
+                return filterByTimePeriod(project, tasks)
+            }
+
+            if(isUserProject(project))  {
+                return filterByProjectName(project, tasks)
+            }
+        }
+
+        function filterByTimePeriod(project, tasks) {
+
+            let treshold = calcTreshold(project)
+
+            let filteredTasks = tasks.filter(task => {
+                let dateObj = taskComponents.datecalc(task);
+                if (dateObj['daysDifference'] <= treshold)
+                    return true
+                })
+
+            return filteredTasks;
+
+            function calcTreshold(project) {
+                if (project == 'this week') {
+                    return 7
+            } if (project =='this month') {
+                    return calculateDaysToEndOfMonth()
+                }
+        }
+
+        function calculateDaysToEndOfMonth(){
+            const date = new Date();
+            const currentYear = date.getFullYear();
+            const currentMonth = date.getMonth() + 1;
+            const currentDay = date.getDate();
+            const daysThismonth = getDaysInMonth(currentYear, currentMonth);
+
+            return daysThismonth - currentDay
+
+            function getDaysInMonth(year, month) {
+                return new Date(year, month, 0).getDate();
+            }
+
+
+        }
+
+        }
+
+        function filterByProjectName(project, tasks) {
+            tasks = read.filterTasksforProject(tasks, project);
+            return tasks;
+
+
+
+        }
+        function spawnTasks(tasks) {
+            for (let name in tasks) {
+                taskComponents.makeTask(tasks[name])
+            }
+        }
+        function isUserProject(project) {
+
+            let projects = read.getProjects().push('inbox');
+            if (project.includes(project)) {
+                return true;
+            }
+        }
+
+        function isTimedProject(project) {
+            if ((project == "this week") | (project == 'this month')) {
+                return true
+            }
+            return false
         }
     }
-    static #makeTask(task) {
+
+    static datecalc(task) {
+        let taskDueDate = task['date']
+        let DueDate = new Date(taskDueDate)
+        const start = new Date(dayjs().startOf('day'));
+        var currentTime = new Date();
+        let weekDay = DueDate.toLocaleString('en-us', {weekday: 'long'});
+        // let difference = DueDate.getTime() - currentTime.getTime();
+        let difference2 = DueDate.getTime() - start.getTime();
+        const days = mstoDays(difference2);
+
+
+        const DateObj = {
+            daysDifference : days,
+            readableDate : tostring(days, weekDay)
+        }
+        return DateObj
+
+        function mstoDays(ms) {
+
+            return Math.floor(ms / (24 * 60 * 60 * 1000));
+        }
+
+        function tostring(days, weekDay) {
+            if (days < 0) {
+                return 'overdue';
+            }
+            if (days==0) {
+                return 'today';
+            }
+            if (days ==1) {
+                return 'tomorrow';
+            }
+            if (days ==2) {
+                return 'in two days';
+            }
+            if (days > 2 && days < 7) {
+                return `on ${weekDay.toLowerCase()}`;
+            }
+            if (days > 7 && days < 14) {
+                return `next ${weekDay.toLowerCase()}`;
+            }
+            if (days > 14 && days < 21) {
+                return `in two weeks`;
+            }
+            if (days > 21 && days < 28) {
+                return `three weeks`;
+            }
+            if (days > 28 && days < 364) {
+                let string = '' + DueDate
+                string = string.slice(4, 11)
+                return string;
+            }
+            if (days > 365) {
+                let string = '' + DueDate
+                string = string.slice(4, 15)
+                return string;
+            }
+
+
+
+        }
+    }
+    static makeTask(task) {
 
         let taskElement = UI.addHTML('div', '', ['task-component', task['priority']], task['name'])
         let description = UI.addHTML('div', task['name'], ['task-description'], '')
         let checkbox = UI.addHTML('div', '', ['task-checkbox'], '')
         checkbox.addEventListener('click', function(event)  {
             event.stopPropagation();
-            tasks.#deleteTask(taskElement);
+            taskComponents.#deleteTask(task['name']);
             })
 
         let container = document.getElementById('tasks')
         taskElement.appendChild(checkbox)
         taskElement.appendChild(description)
+
         if(task['date']) {
-            let date = UI.addHTML('div', task['date'], ['task-date'], '')
+            let dateObj = taskComponents.datecalc(task)
+
+            let date = UI.addHTML('div', dateObj.readableDate, ['task-date'], '')
+            //TODO make overdue red
+            if (dateObj.readableDate == "overdue") {
+                date.style.color="red;"
+            }
             taskElement.appendChild(date)
         }
 
@@ -442,9 +598,8 @@ class tasks {
 
     }
     static #deleteTask(task) {
-        let taskname = task.innerText;
-        write.removeObject('tasks', taskname);
-        tasks.loadTasks(currentProject);
+        write.removeObject('tasks', task);
+        taskComponents.loadTasks(currentProject);
 
 
     }
