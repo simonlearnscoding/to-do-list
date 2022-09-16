@@ -114,8 +114,8 @@ class read{
     }
 
     static getItems(type) {
-        let product = localStorage.getItem(type);
-        product = JSON.parse(product)
+        let product = JSON.parse(localStorage.getItem(type)) || [];
+        // product = JSON.parse(product)
         let obj = product.map(item => item)
         return obj;
     }
