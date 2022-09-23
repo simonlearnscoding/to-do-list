@@ -1,126 +1,88 @@
-import {updatecurrentProject} from "./components";
+import {updateCurrentProject, taskComponents, projectList} from "./components";
 
 class write {
-
+         projectList = projectList
     static write(type, event) {
-        let obj = write.#createObject(event);
-        write.#addItemToStorage(type, obj);
+        let obj = write.#createObject(event); //turn the event into an object
+        write.#addItemToStorage(type, obj); //add to database
+        addInstanceOfObject(obj) // add object locally
+        function addInstanceOfObject(obj) {
+            if(obj.type === 'tasks') {
+                taskComponents.createTaskObject(obj);
+            }
+            else{
+                taskComponents.createProjectObject(obj)
+            }
+        }
+
     }
     static change(type, event, object) {
-        const obj = write.#createObject(event)
         let tasks = JSON.parse(localStorage.getItem(type)) || [];
-        for (var i = 0; i < tasks.length; i++) {
-            if (tasks[i].name == object.name) {
-                for (const attr in tasks[i]) {
-                    tasks[i][attr] = obj[attr]
-                }
-                break;
-            }
+        const obj = write.#createObject(event)
+           const oldObject =  {...object}
 
-        }
+        tasks.filter(task => task['name'] ===  oldObject.name).map(task =>   Object.assign(task, obj))
+        // const uneditedTasks = tasks.filter(task => task['name'] !==  oldObject.name)
+         console.log(tasks)
         localStorage.setItem(type, JSON.stringify(tasks));
-        if(type == 'project') {
+       // const newArray = [...updatedTasks, ...uneditedTasks]
 
-            updatecurrentProject(object.name, obj.name);
-            write.changeTaskProject(object.name, obj.name);
+        if(type === 'project') {
+            updateCurrentProject(oldObject.name, obj.name);
+            changeTaskProjectName(oldObject.name, obj.name);
         }
-    }
 
-    static changeTaskProject(oldname, newname) {
-        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-        for (var i = 0; i < tasks.length; i++) {
-            if (tasks[i].project == oldname) {
-                tasks[i].project = newname;
+        function changeTaskProjectName(oldName, newName) {
+            let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+            for (let i = 0; i < tasks.length; i++) {
+                if (tasks[i].project === oldName) {
+                    tasks[i].project = newName;
+
+                }
             }
-        }
-        localStorage.setItem('tasks', JSON.stringify(tasks));
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+
     }
 
+        taskComponents.createProjects()
+        taskComponents.createTasks()
+    }
     static #createObject(event) {
         event.preventDefault();
         const myFormData = new FormData(event.target);
-        const formDataObj = Object.fromEntries(myFormData.entries());
-        // TODO generate unique object ID
-        return formDataObj;
+        return Object.fromEntries(myFormData.entries());
     }
-
     static #addItemToStorage(type, obj) {
         let tasks = JSON.parse(localStorage.getItem(type)) || [];
         tasks.push(obj);
         localStorage.setItem(type, JSON.stringify(tasks));
     }
-
     static removeProject(project) {
-        write.removeObject('project', project);
-        write.removeProjectTasks(project);
+        write.removeObject('project', project, "name"); // remove the project from the list
+        write.removeObject('tasks', project, "project"); // and all it's corresponding tasks
     }
-
-
-    static removeObject(type, name) {
-        let tasks = JSON.parse(localStorage.getItem(type)) || [];
-        for (var i = 0; i < tasks.length; i++) {
-            if (tasks[i].name == name) {
-                tasks.splice(i, 1);
-                break;
-            }
-
-        }
-        localStorage.setItem(type, JSON.stringify(tasks));
-    }
-
-    static removeProjectTasks(name) {
-        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-        for(var i = 0; i < tasks.length; i++) {
-            if(tasks[i].project == name) {
-                tasks.splice(i, 1);
-            }
-        }
-
-        localStorage.setItem('tasks', JSON.stringify(tasks));
+    static removeObject(type, name, attribute="name") {
+        const objects = JSON.parse(localStorage.getItem(type)) || [];
+        const UpdatedObjectsArray = objects.filter(object => object[attribute] !== name)
+        localStorage.setItem(type, JSON.stringify(UpdatedObjectsArray));
     }
 }
-
 class read{
-
     static getObject(type, name) {
         let tasks = JSON.parse(localStorage.getItem(type)) || [];
-        for (var i = 0; i < tasks.length; i++) {
-            if (tasks[i].name == name) {
-                return tasks[i];
-            }
-        }
+        return tasks.filter(task => task.name === name)[0]
     }
-
-
     static getProjects() {
-        const obj = read.getItems('project').map(proj => proj['name'])
-        return obj
+        return read.getItems('project').map(proj => proj['name'])
     }
-
-    static getTasks(){
-        return read.getItems('tasks')
-        }
-
     static filterTasksforProject(tasks, project){
-        // let obj = []
-        let obj = tasks.filter(item => item['project'] ==  project)
-        // for (const item in tasks) {
-        //     if (tasks[item]['project'] === project) {
-        //         obj.push(tasks[item])
-        //     }
-        // }
-        return obj;
+        return tasks.filter(item => item['project'] ===  project);
 
     }
-
     static getItems(type) {
-        let product = JSON.parse(localStorage.getItem(type)) || [];
-        // product = JSON.parse(product)
-        let obj = product.map(item => item)
-        return obj;
+        return JSON.parse(localStorage.getItem(type)) || [];
+        // return product.map(item => item);
     }
 }
 
 export {read, write};
-
-

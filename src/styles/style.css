@@ -250,7 +250,7 @@ body {
   justify-content: center;
   align-items: center;
 }
-.popup.task {
+.popup.tasks {
   grid-area: 2fr 2fr 1fr 2fr/2fr 1fr 1fr 1fr;
   grid-template-areas: " name name name name " " desc desc desc desc " " proj proj prio date " " . . cancel ok";
 }

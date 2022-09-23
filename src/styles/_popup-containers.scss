@@ -17,7 +17,7 @@
   height: 40vh;
   display: grid;
   padding: 2rem;
-  &.task {
+  &.tasks {
     grid-area: 2fr 2fr 1fr 2fr / 2fr 1fr 1fr 1fr;
     grid-template-areas:
   ' name name name name '

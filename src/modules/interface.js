@@ -4,7 +4,7 @@ import {projectComponents, taskComponents} from './components';
 
 import Icon from './../assets/iconPlus.png';
 import keyButtons from "./hotkeys";
-import {popups} from "./popups";
+import {ProjectPopup, TaskPopup} from "./popups";
 const body = document.body;
 const content = document.createElement('div')
 
@@ -55,20 +55,33 @@ export default class UI {
     static addHTML(type, content, classnames=null, id=null ) {
         let element = document.createElement(type);
         element.innerHTML = content;
-        if (classnames !== null) {
-            for (let name in classnames) {
-                element.classList.add(classnames[name]);
-            }}
-        if (id !== null) {
-            element.id = id;
-        }
-        return element;
-        }
-}
+        UI.giveHTMLIdentity(element, classnames, id)
+        return element
+    }
 
+    static giveHTMLIdentity(element, classes, id) {
+        addClasses(element, classes)
+        addID(element, id)
+        return element;
+
+        function addClasses(element, classes) {
+            if (classes !== null) {
+                for (let name in classes) {
+                    element.classList.add(classes[name]);
+                }}
+        }
+        function addID(element, id) {
+            if (id !== null) {
+                element.id = id;
+            }
+        }
+        }
+
+}
 class Elements {
     static createElements() {
-
+        taskComponents.createTasks()
+        taskComponents.createProjects()
         projectComponents.loadProjects();
         taskComponents.loadTasks('inbox'); // TODO filter for inbox
         buttons.createButtons();
@@ -83,7 +96,6 @@ class Elements {
         container.innerHTML = ''
     }
 }
-
 class buttons {
 
 
@@ -95,7 +107,7 @@ class buttons {
         let button = UI.addHTML('div', '+ Add a project', ['button','project'], 'add-project-button');
         const projContainer = document.getElementById('sidebar')
         projContainer.appendChild(button);
-        button.addEventListener('click', popups.createProjectPopup);
+        button.addEventListener('click', () => new ProjectPopup);
     }
     static #createTaskButton(){
         let button = UI.addHTML('div', '', ['button','task'], 'add-task-button');
@@ -103,7 +115,8 @@ class buttons {
         myIcon.src = Icon;
         button.appendChild(myIcon);
         body.appendChild(button);
-        button.addEventListener('click', popups.createTaskPopup);
+
+        button.addEventListener('click', () => new TaskPopup);
     }
 }
 
